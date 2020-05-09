@@ -1,0 +1,5 @@
+[local]
+name=MP3 Support
+baseurl=file:///root/mp3pkg
+enabled=1
+gpgcheck=0

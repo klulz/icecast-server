@@ -1,0 +1,17 @@
+version: '3'
+
+services:
+  streambot:
+    build:
+      context: ./streambot
+    env_file: ./streambot.env
+    depends_on:
+      - icecast
+  icecast:
+    build:
+      context: ./icecast
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./icecast.xml:/etc/icecast2/icecast.xml
+      - ./icecast-logs:/var/log/icecast2
