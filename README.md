@@ -25,11 +25,11 @@ You should edit the sample `icecast.xml` file and configure mountpoints and pass
 Stream sources such as streambot and DJs connect to different mountpoints with differing priority levels. When a source connects to a mountpoint of higher priority than what is currently playing, listeners will be moved to the new mountpoint.
 
 Typical setup:
-* `/error.mp3` - An audio file that is played when everything is offline (something broke)
-* `/zsoundcheck.mp3` - Lowest priority, listeners should never hear, just for testing sources
+* `/dj1.mp3` - Higher-priority streamer can connect here
+* `/dj2.mp3` - Streamer can connect here
 * `/streambot.mp3` - Default shuffle playlist, provided by streambot
-* `/dj1.mp3` - Current streamer can connect here
-* `/dj2.mp3` - Higher-priority streamer can connect here
+* `/zsoundcheck.mp3` - Lowest priority, listeners should never hear, just for testing sources
+* `/error.mp3` - An audio file that is played when everything is offline (something broke)
 
 
 ## Streambot
