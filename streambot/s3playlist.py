@@ -7,6 +7,7 @@ import random
 import re
 import sys
 import time
+import json
 from configparser import ConfigParser
 
 import boto3
@@ -19,6 +20,12 @@ log = logging.getLogger(__name__)
 
 class S3Playlister:
     """Grabs files from the specified bucket and plays a random one."""
+
+    playlist_cache_file: str
+    storage_dir: str
+    bucket_name: str
+    s3_prefix: str
+    config: dict
 
     def __init__(self):
         """Init."""
@@ -39,6 +46,7 @@ class S3Playlister:
         if not os.path.exists(storage_dir):
             os.makedirs(storage_dir)
         self.storage_dir = storage_dir
+        self.playlist_cache_file = os.path.join(self.storage_dir, "playlist_cache.txt")
         boto3.set_stream_logger("botocore", level=logging.WARN)
         boto3.set_stream_logger("s3transfer", level=logging.WARN)
         boto3.set_stream_logger(level=logging.WARN)
@@ -68,11 +76,7 @@ class S3Playlister:
 
         # do we have this file already?
         fpath = os.path.join(self.storage_dir, self._slugify(mp3key))
-        if os.path.exists(fpath):
-            # TODO: compare last modified times
-            # lastmod = os.path.getmtime(fpath)
-            pass
-        else:
+        if not os.path.exists(fpath):
             # make dirs
             dpath = os.path.dirname(fpath)
             if not os.path.exists(dpath):
@@ -105,9 +109,17 @@ class S3Playlister:
                 print(f"Cleaning up {fpath}")
                 os.remove(fpath)
 
-    def get_s3_files(self):
+    def get_s3_files(self) -> list:
         """List the files in the bucket."""
         ret = []
+
+        # check for cached s3 list
+        if os.path.exists(self.playlist_cache_file):
+            with open(self.playlist_cache_file) as fh:
+                try:
+                    return json.load(fh)
+                except Exception as err:
+                    log.exception(err)
 
         def get_more(tok=""):
             params = dict(Bucket=self.bucket_name)
@@ -117,6 +129,7 @@ class S3Playlister:
                 params["Prefix"] = self.s3_prefix
             return self.s3client().list_objects_v2(**params)
 
+        log.info("Fetching list of files in S3...")
         res = get_more()
         ret.extend(res["Contents"])
 
@@ -127,6 +140,15 @@ class S3Playlister:
                 ret += res["Contents"]
             else:
                 print("Failed to find NextContinuationToken")
+
+        # remove stuff we don't care about
+        for r in ret:
+            for f in ("LastModified", "ETag", "StorageClass"):
+                del r[f]
+
+        # save s3 list response in cache
+        with open(self.playlist_cache_file, "w") as fh:
+            json.dump(ret, fh, ensure_ascii=False, indent=4)
 
         return ret
 

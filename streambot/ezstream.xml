@@ -184,7 +184,8 @@
         <!-- MP3 decoder -->
         <decoder>
             <name>MadPlay</name>
-            <program>madplay -b 16 -R 44100 -S --replay-gain=radio --fade-in=1 -o raw:- @T@</program>
+            <!-- https://www.systutorials.com/docs/linux/man/1-madplay/ -->
+            <program>madplay -b 16 -R 44100 -S --replay-gain=radio --attenuate=-6 --fade-in=1 -o raw:- @T@</program>
             <file_ext>.mp3</file_ext>
         </decoder>
 

@@ -238,8 +238,8 @@
              May be made specific to a port or bound address using the "port"
              and "bind-address" attributes.
         -->
-        <alias source="/listen.mp3" destination="/dj1.mp3"/>
         <alias source="/listen.mp3.m3u" destination="/dj1.mp3.m3u"/>
+        <alias source="/listen.mp3" destination="/dj1.mp3"/>
 
         <!-- Aliases: can also be used for simple redirections as well,
              this example will redirect all requests for http://server:port/ to
