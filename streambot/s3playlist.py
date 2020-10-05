@@ -7,8 +7,10 @@ import random
 import re
 import sys
 import time
+import shutil
 import json
 from configparser import ConfigParser
+from typing import Optional
 
 import boto3
 
@@ -16,6 +18,9 @@ import eyed3
 
 logging.basicConfig(level=logging.INFO)
 log = logging.getLogger(__name__)
+
+# when to clean up old downloaded files and cached s3 list
+MAX_AGE = 3600 * 1  # 1 hour ago == old
 
 
 class S3Playlister:
@@ -96,18 +101,24 @@ class S3Playlister:
             log.error(e)
         sys.exit(1)
 
-    def clean_old_files(self):
+    def clean_old_files(self, clean_all: Optional[bool] = False):
         """Delete files downloaded more than a while ago so we don't fill up the disk."""
-        old_time_sec = 3600 * 2  # 2 hours ago == old
-
         now = time.time()
         path = self.storage_dir
         # https://stackoverflow.com/questions/12485666/python-deleting-all-files-in-a-folder-older-than-x-days
         for filename in os.listdir(path):
             fpath = os.path.join(path, filename)
-            if os.path.getmtime(fpath) < now - old_time_sec and os.path.isfile(fpath):
+            if clean_all or (
+                os.path.getmtime(fpath) < now - MAX_AGE and os.path.isfile(fpath)
+            ):
                 print(f"Cleaning up {fpath}")
-                os.remove(fpath)
+                try:
+                    if os.path.isdir(fpath):
+                        shutil.rmtree(fpath)
+                    else:
+                        os.remove(fpath)
+                except Exception as ex:
+                    log.exception(ex)
 
     def get_s3_files(self) -> list:
         """List the files in the bucket."""
@@ -148,7 +159,12 @@ class S3Playlister:
 
         # save s3 list response in cache
         with open(self.playlist_cache_file, "w") as fh:
-            json.dump(ret, fh, ensure_ascii=False, indent=4)
+            try:
+                json.dump(ret, fh, ensure_ascii=False, indent=4)
+            except Exception as ex:
+                log.exception(ex)
+                # disk probably full
+                self.clean_old_files(clean_all=True)
 
         return ret
 
