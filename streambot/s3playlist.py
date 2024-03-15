@@ -1,19 +1,18 @@
 #!/usr/bin/env python3
 """S3 bucket playlist generator."""
 
+import json
 import logging
 import os
 import random
 import re
+import shutil
 import sys
 import time
-import shutil
-import json
 from configparser import ConfigParser
 from typing import Optional
 
 import boto3
-
 import eyed3
 
 logging.basicConfig(level=logging.INFO)
@@ -69,14 +68,15 @@ class S3Playlister:
         if not mp3keys:
             self._fail("No files found in bucket {}".format(self.bucket_name))
         # pick random key, get file obj
-        mp3key = random.sample(mp3keys, 1)[0]
-        mp3keyobj = None
+        mp3key = random.choice(list(mp3keys))
         # search and find the response obj
         for f in files:
             if f["Key"] == mp3key:
                 mp3keyobj = f
                 break
         else:
+            self._fail("Couldn't locate file with key", mp3key)
+        if not mp3keyobj:
             self._fail("Couldn't locate file with key", mp3key)
 
         # do we have this file already?

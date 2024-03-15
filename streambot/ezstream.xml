@@ -191,7 +191,7 @@
 
         <decoder>
             <name>Flac</name>
-            <program>flac -s -d --force-raw-format --sign=signed --endian=little -o - @T@</program>
+            <program>flac -s -d -V -o - @T@</program>
             <file_ext>.flac</file_ext>
         </decoder>
     </decoders>
@@ -229,7 +229,7 @@
         <encoder>
             <name>Lame-V0</name>
             <format>MP3</format>
-            <program>lame -V0 --bitwidth 16 -s 44.1 -r - -</program>
+            <program>lame -V0 --vbr-new -q 0 --lowpass 19.7 --resample 44.1 --bitwidth 16 -s 44.1 -r - -</program>
         </encoder>
     </encoders>
 </ezstream>
