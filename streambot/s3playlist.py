@@ -55,6 +55,13 @@ class S3Playlister:
         boto3.set_stream_logger("s3transfer", level=logging.WARN)
         boto3.set_stream_logger(level=logging.WARN)
 
+    def pick_random_file(self, files):
+        """Return a random file from the list."""
+        # 4/5 times, delete anything with '/mix/' or '/noise/' in it, so these are played less often
+        if random.random() < 0.8:
+            files = [f for f in files if "/mix/" not in f and "/noise/" not in f]
+        return random.choice(files)
+
     def get_next_file(self):
         """Return next S3 file to play.
 
@@ -68,7 +75,7 @@ class S3Playlister:
         if not mp3keys:
             self._fail("No files found in bucket {}".format(self.bucket_name))
         # pick random key, get file obj
-        mp3key = random.choice(list(mp3keys))
+        mp3key = self.pick_random_file(list(mp3keys))
         # search and find the response obj
         for f in files:
             if f["Key"] == mp3key:

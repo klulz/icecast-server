@@ -12,7 +12,8 @@ RUN ["createrepo", "/root/mp3pkg"]
 RUN ["chmod", "-R", "o-w+r", "/root/mp3pkg"]
 ADD mp3pkg.repo /etc/yum.repos.d/
 RUN yum install -y --nobest libmad-devel lame lame-libs taglib taglib-devel lame-devel wget patch clang make libid3tag-devel \
-  libxml2-devel libvorbis-devel flac libtool gettext-devel check-devel file wget git openssl-devel libzstd-devel 
+  libxml2-devel libvorbis-devel flac libtool gettext-devel check-devel file wget git openssl-devel libzstd-devel  \
+  sox
 RUN rm -rf /etc/yum.repos.d/mp3pkg.repo /root/mp3pkg
 
 # madplay

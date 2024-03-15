@@ -184,14 +184,13 @@
         <!-- MP3 decoder -->
         <decoder>
             <name>MadPlay</name>
-            <!-- https://www.systutorials.com/docs/linux/man/1-madplay/ -->
-            <program>madplay -b 16 -R 44100 -S --replay-gain=radio --attenuate=0 --fade-in=1 -o raw:- @T@</program>
+            <program>madplay -o wav:- --replay-gain=radio @T@ | sox -t wav - -r 44.1k -b 16 -c 2 -t wav - rate 44.1k dither</program>
             <file_ext>.mp3</file_ext>
         </decoder>
 
         <decoder>
             <name>Flac</name>
-            <program>flac -s -d -V -o - @T@</program>
+            <program>flac -c -d -s @T@ | sox -t wav - -r 44.1k -b 16 -c 2 -t wav - rate 44.1k dither</program>
             <file_ext>.flac</file_ext>
         </decoder>
     </decoders>
@@ -226,10 +225,11 @@
             <format>MP3</format>
             <program>lame --preset cbr 256 --bitwidth 16 -s 44.1 -r - -</program>
         </encoder>
+   
         <encoder>
             <name>Lame-V0</name>
             <format>MP3</format>
-            <program>lame -V0 --vbr-new -q 0 --lowpass 19.7 --resample 44.1 --bitwidth 16 -s 44.1 -r - -</program>
+            <program>lame -V0 --vbr-new -q 0 --lowpass 19.7 - -</program>
         </encoder>
     </encoders>
 </ezstream>
