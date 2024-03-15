@@ -1,5 +1,5 @@
 ##### ICECAST2
-FROM ubuntu:focal AS icecast-klulz
+FROM ubuntu:noble AS icecast-klulz
 
 MAINTAINER Mischa Spiegelmock "me@mish.dev"
 
