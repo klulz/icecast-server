@@ -184,7 +184,7 @@
         <!-- MP3 decoder -->
         <decoder>
             <name>MadPlay</name>
-            <program>madplay -o wav:- --replay-gain=radio @T@ | sox -t wav - -r 44.1k -b 16 -c 2 -t wav - rate 44.1k dither</program>
+            <program>madplay -o wav:- --replay-gain=radio --attenuate=0 @T@ | sox -t wav - -r 44.1k -b 16 -c 2 -t wav - rate 44.1k dither</program>
             <file_ext>.mp3</file_ext>
         </decoder>
 
